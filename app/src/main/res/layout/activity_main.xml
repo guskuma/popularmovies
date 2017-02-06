@@ -9,5 +9,22 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_movies_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/tv_empty_list"
+        android:text="@string/empty_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:visibility="invisible"/>
+
+    <ProgressBar
+        android:id="@+id/pb_fetching"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
+
 </FrameLayout>
