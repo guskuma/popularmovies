@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PopularMovies</string>
+    <string name="app_name">Popular Movies</string>
     <string name="empty_list">No movie retrieved</string>
     <string name="fetch_fail">Movies list could not be fetched</string>
 </resources>

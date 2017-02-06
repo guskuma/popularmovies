@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -57,11 +58,18 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
         fetchMoviesList(1);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2, LinearLayoutManager.VERTICAL, false);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, calculateNumRows(), LinearLayoutManager.VERTICAL, false);
         mMoviesList.setLayoutManager(layoutManager);
         mMoviesList.setHasFixedSize(false);
         mMoviesList.setAdapter(mTMDbAdapter);
 
+    }
+
+    private int calculateNumRows(){
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int noOfColumns = (int) (dpWidth / 185);
+        return noOfColumns;
     }
 
     @Override
