@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.guskuma.tmdbapi.MovieFilterDescriptor;
 import com.guskuma.tmdbapi.MovieResultSet;
-import com.guskuma.tmdbapi.TMDbClient;
+import com.guskuma.tmdbapi.TMDbService;
 
 import butterknife.BindString;
 import butterknife.BindView;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @BindString(R.string.fetch_fail) String toastMessage;
 
     int mLastPageLoaded = 0;
-    TMDbClient mMovieService;
+    TMDbService mMovieService;
     TMDbAdapter mTMDbAdapter;
     Toast mToast;
 
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
-                .create(TMDbClient.class);
+                .create(TMDbService.class);
 
         fetchMoviesList(1);
 
