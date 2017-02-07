@@ -17,6 +17,7 @@ import com.google.gson.GsonBuilder;
 import com.guskuma.tmdbapi.MovieFilterDescriptor;
 import com.guskuma.tmdbapi.MovieResultSet;
 import com.guskuma.tmdbapi.TMDbService;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindString;
 import butterknife.BindView;
@@ -38,9 +39,9 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     @BindString(R.string.fetch_fail) String toastMessage;
 
-    int mLastPageLoaded = 0;
     TMDbService mMovieService;
     TMDbAdapter mTMDbAdapter;
+    EndlessRecyclerViewScrollListener mEndlessScrollListener;
     Toast mToast;
 
     @Override
@@ -62,6 +63,15 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mMoviesList.setLayoutManager(layoutManager);
         mMoviesList.setHasFixedSize(false);
         mMoviesList.setAdapter(mTMDbAdapter);
+
+        mEndlessScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page) {
+                fetchMoviesList(page);
+            }
+        };
+
+        mMoviesList.addOnScrollListener(mEndlessScrollListener);
 
     }
 
@@ -91,8 +101,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     public void onResponse(Call<MovieResultSet> call, Response<MovieResultSet> response) {
         if(response.isSuccessful()) {
             MovieResultSet movieResultSet = response.body();
-            mLastPageLoaded = movieResultSet.page;
-            mTMDbAdapter.addMovies(mLastPageLoaded, movieResultSet.results);
+            mTMDbAdapter.addMovies(movieResultSet.page, movieResultSet.results);
 
             toggleViewsVisibility(true);
         } else {

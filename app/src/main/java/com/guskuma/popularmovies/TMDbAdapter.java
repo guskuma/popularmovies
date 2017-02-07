@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -47,6 +48,9 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
     public class MovieItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.iv_movie_poster) ImageView mMoviePosterImageView;
         @BindView(R.id.tv_movie_title)TextView mMovieTitleTextView;
+        @BindView(R.id.tv_movie_rating ) TextView mMovieRating;
+        @BindString(R.string.rating) String mRatingText;
+
 
         public MovieItemViewHolder(View itemView) {
             super(itemView);
@@ -61,9 +65,29 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
         }
 
         public void bind(Movie movie){
-            Uri imageUri = new Uri.Builder().scheme("http").path("image.tmdb.org/t/p/").appendPath("w185").appendPath(movie.poster_path.replace("/", "")).build();
             mMovieTitleTextView.setText(movie.title);
+            mMovieRating.setText(String.format(mRatingText, movie.vote_average));
+
+            Uri imageUri = new Uri.Builder()
+                    .scheme("http")
+                    .authority("image.tmdb.org")
+                    .appendPath("t")
+                    .appendPath("p")
+                    .appendPath("w185")
+                    .appendPath(movie.poster_path.replace("/", ""))
+                    .build();
+
             Picasso.with(itemView.getContext()).load(imageUri.toString()).into(mMoviePosterImageView);
+//            Picasso.Builder builder = new Picasso.Builder(itemView.getContext());
+//            builder.listener(new Picasso.Listener()
+//            {
+//                @Override
+//                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
+//                {
+//                    exception.printStackTrace();
+//                }
+//            });
+//            builder.build().load(imageUri.toString()).into(mMoviePosterImageView);
         }
 
     }
