@@ -11,7 +11,7 @@ public class Language implements Parcelable {
 
     public static final String EXTRA_NAME = Language.class.getSimpleName();
 
-    public String iso6391;
+    public String iso_639_1;
     public String name;
 
 
@@ -22,7 +22,7 @@ public class Language implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.iso6391);
+        dest.writeString(this.iso_639_1);
         dest.writeString(this.name);
     }
 
@@ -30,7 +30,7 @@ public class Language implements Parcelable {
     }
 
     protected Language(Parcel in) {
-        this.iso6391 = in.readString();
+        this.iso_639_1 = in.readString();
         this.name = in.readString();
     }
 

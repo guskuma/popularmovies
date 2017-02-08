@@ -14,30 +14,30 @@ public class DetailedMovie implements Parcelable {
     public static final String EXTRA_NAME = DetailedMovie.class.getSimpleName();
 
     public boolean adult;
-    public String backdropPath;
-    public MovieCollection belongsToCollection;
+    public String backdrop_path;
+    public MovieCollection belongs_to_collection;
     public int budget;
     public List<Genre> genres = null;
     public String homepage;
     public int id;
-    public String imdbId;
-    public String originalLanguage;
-    public String originalTitle;
+    public String imdb_id;
+    public String original_language;
+    public String original_title;
     public String overview;
     public double popularity;
-    public String posterPath;
-    public List<Producer> productionCompanies = null;
-    public List<Country> productionCountries = null;
-    public String releaseDate;
+    public String poster_path;
+    public List<Producer> production_companies = null;
+    public List<Country> production_countries = null;
+    public String release_date;
     public int revenue;
     public int runtime;
-    public List<Language> spokenLanguages = null;
+    public List<Language> spoken_languages = null;
     public String status;
     public String tagline;
     public String title;
     public boolean video;
-    public double voteAverage;
-    public int voteCount;
+    public double vote_average;
+    public int vote_count;
 
     @Override
     public int describeContents() {
@@ -47,30 +47,30 @@ public class DetailedMovie implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte(this.adult ? (byte) 1 : (byte) 0);
-        dest.writeString(this.backdropPath);
-        dest.writeParcelable(this.belongsToCollection, flags);
+        dest.writeString(this.backdrop_path);
+        dest.writeParcelable(this.belongs_to_collection, flags);
         dest.writeInt(this.budget);
         dest.writeTypedList(this.genres);
         dest.writeString(this.homepage);
         dest.writeInt(this.id);
-        dest.writeString(this.imdbId);
-        dest.writeString(this.originalLanguage);
-        dest.writeString(this.originalTitle);
+        dest.writeString(this.imdb_id);
+        dest.writeString(this.original_language);
+        dest.writeString(this.original_title);
         dest.writeString(this.overview);
         dest.writeDouble(this.popularity);
-        dest.writeString(this.posterPath);
-        dest.writeTypedList(this.productionCompanies);
-        dest.writeTypedList(this.productionCountries);
-        dest.writeString(this.releaseDate);
+        dest.writeString(this.poster_path);
+        dest.writeTypedList(this.production_companies);
+        dest.writeTypedList(this.production_countries);
+        dest.writeString(this.release_date);
         dest.writeInt(this.revenue);
         dest.writeInt(this.runtime);
-        dest.writeTypedList(this.spokenLanguages);
+        dest.writeTypedList(this.spoken_languages);
         dest.writeString(this.status);
         dest.writeString(this.tagline);
         dest.writeString(this.title);
         dest.writeByte(this.video ? (byte) 1 : (byte) 0);
-        dest.writeDouble(this.voteAverage);
-        dest.writeInt(this.voteCount);
+        dest.writeDouble(this.vote_average);
+        dest.writeInt(this.vote_count);
     }
 
     public DetailedMovie() {
@@ -78,30 +78,30 @@ public class DetailedMovie implements Parcelable {
 
     protected DetailedMovie(Parcel in) {
         this.adult = in.readByte() != 0;
-        this.backdropPath = in.readString();
-        this.belongsToCollection = in.readParcelable(MovieCollection.class.getClassLoader());
+        this.backdrop_path = in.readString();
+        this.belongs_to_collection = in.readParcelable(MovieCollection.class.getClassLoader());
         this.budget = in.readInt();
         this.genres = in.createTypedArrayList(Genre.CREATOR);
         this.homepage = in.readString();
         this.id = in.readInt();
-        this.imdbId = in.readString();
-        this.originalLanguage = in.readString();
-        this.originalTitle = in.readString();
+        this.imdb_id = in.readString();
+        this.original_language = in.readString();
+        this.original_title = in.readString();
         this.overview = in.readString();
         this.popularity = in.readDouble();
-        this.posterPath = in.readString();
-        this.productionCompanies = in.createTypedArrayList(Producer.CREATOR);
-        this.productionCountries = in.createTypedArrayList(Country.CREATOR);
-        this.releaseDate = in.readString();
+        this.poster_path = in.readString();
+        this.production_companies = in.createTypedArrayList(Producer.CREATOR);
+        this.production_countries = in.createTypedArrayList(Country.CREATOR);
+        this.release_date = in.readString();
         this.revenue = in.readInt();
         this.runtime = in.readInt();
-        this.spokenLanguages = in.createTypedArrayList(Language.CREATOR);
+        this.spoken_languages = in.createTypedArrayList(Language.CREATOR);
         this.status = in.readString();
         this.tagline = in.readString();
         this.title = in.readString();
         this.video = in.readByte() != 0;
-        this.voteAverage = in.readDouble();
-        this.voteCount = in.readInt();
+        this.vote_average = in.readDouble();
+        this.vote_count = in.readInt();
     }
 
     public static final Parcelable.Creator<DetailedMovie> CREATOR = new Parcelable.Creator<DetailedMovie>() {

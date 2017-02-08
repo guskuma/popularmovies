@@ -13,8 +13,8 @@ public class MovieCollection implements Parcelable {
 
     public int id;
     public String name;
-    public String posterPath;
-    public String backdropPath;
+    public String poster_path;
+    public String backdrop_path;
 
 
     @Override
@@ -26,8 +26,8 @@ public class MovieCollection implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.id);
         dest.writeString(this.name);
-        dest.writeString(this.posterPath);
-        dest.writeString(this.backdropPath);
+        dest.writeString(this.poster_path);
+        dest.writeString(this.backdrop_path);
     }
 
     public MovieCollection() {
@@ -36,8 +36,8 @@ public class MovieCollection implements Parcelable {
     protected MovieCollection(Parcel in) {
         this.id = in.readInt();
         this.name = in.readString();
-        this.posterPath = in.readString();
-        this.backdropPath = in.readString();
+        this.poster_path = in.readString();
+        this.backdrop_path = in.readString();
     }
 
     public static final Parcelable.Creator<MovieCollection> CREATOR = new Parcelable.Creator<MovieCollection>() {
