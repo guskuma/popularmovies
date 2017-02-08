@@ -1,4 +1,4 @@
-package com.guskuma.popularmovies;
+package com.guskuma.tmdbapi;
 
 import android.content.Context;
 import android.net.Uri;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.guskuma.tmdbapi.Movie;
+import com.guskuma.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
