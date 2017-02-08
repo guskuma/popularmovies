@@ -11,8 +11,14 @@ import retrofit2.http.Query;
 
 public interface TMDbService {
 
+    public static final String BASE_URL = "http://api.themoviedb.org/";
+
     //https://api.themoviedb.org/3/movie/popular?api_key=<<api_key>>&language=en-US&page=1
     @GET("3/movie/{category}")
     Call<MovieResultSet> getMoviesList(@Path("category") @MovieFilterDescriptor.MovieFilterDef String category, @Query("api_key") String apiKey, @Query("language")String language, @Query("page") int page);
+
+    //https://api.themoviedb.org/3/movie/328111?api_key=<<api_key>>&language=en-U
+    @GET("3/movie/{movie_id}")
+    Call<DetailedMovie> getMovieDetail(@Path("movie_id") int movieId, @Query("api_key") String apiKey, @Query("language")String language);
 
 }

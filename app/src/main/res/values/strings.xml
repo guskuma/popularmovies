@@ -3,4 +3,5 @@
     <string name="empty_list">No movie retrieved</string>
     <string name="fetch_fail">Movies list could not be fetched</string>
     <string name="rating">Rating: %s of 10</string>
+    <string name="action_settings">Settings</string>
 </resources>

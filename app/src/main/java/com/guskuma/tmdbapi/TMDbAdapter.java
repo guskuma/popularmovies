@@ -61,7 +61,8 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
         @Override
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
-            mClickListener.onListItemClick(clickedPosition);
+            Movie selectedMovie = mMovies.get(clickedPosition);
+            mClickListener.onListItemClick(selectedMovie);
         }
 
         public void bind(Movie movie){
@@ -93,7 +94,7 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
     }
 
     public interface MovieItemClickListener {
-        void onListItemClick(int clickedItemIndex);
+        void onListItemClick(Movie selectedMovie);
     }
 
     @Override

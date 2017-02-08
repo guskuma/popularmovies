@@ -1,5 +1,6 @@
 package com.guskuma.popularmovies;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,10 +15,11 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.guskuma.tmdbapi.Movie;
 import com.guskuma.tmdbapi.MovieFilterDescriptor;
 import com.guskuma.tmdbapi.MovieResultSet;
+import com.guskuma.tmdbapi.TMDbAdapter;
 import com.guskuma.tmdbapi.TMDbService;
-import com.squareup.picasso.Picasso;
 
 import butterknife.BindString;
 import butterknife.BindView;
@@ -29,8 +31,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements Callback<MovieResultSet>, TMDbAdapter.MovieItemClickListener {
-
-    public static final String BASE_URL = "http://api.themoviedb.org/";
     String TAG = MainActivity.class.getSimpleName();
 
     @BindView(R.id.rv_movies_list) RecyclerView mMoviesList;
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
         Gson gson = new GsonBuilder().setLenient().create();
         mMovieService = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(TMDbService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
                 .create(TMDbService.class);
@@ -83,8 +83,10 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     }
 
     @Override
-    public void onListItemClick(int clickedItemIndex) {
-
+    public void onListItemClick(Movie movie) {
+        Intent i = new Intent(this, MovieDetailActivity.class);
+        i.putExtra(Movie.EXTRA_NAME, movie);
+        startActivity(i);
     }
 
     public void fetchMoviesList(int pageToLoad){
