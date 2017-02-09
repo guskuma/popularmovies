@@ -66,6 +66,9 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
         }
 
         public void bind(Movie movie){
+
+            Log.d(TAG, String.format("Binding movie [%s]", movie.title));
+
             mMovieTitleTextView.setText(movie.title);
             mMovieRating.setText(String.format(mRatingText, movie.vote_average));
 
