@@ -48,8 +48,6 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
     public class MovieItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.iv_movie_poster) ImageView mMoviePosterImageView;
         @BindView(R.id.tv_movie_title)TextView mMovieTitleTextView;
-        @BindView(R.id.tv_movie_rating ) TextView mMovieRating;
-        @BindString(R.string.rating) String mRatingText;
 
 
         public MovieItemViewHolder(View itemView) {
@@ -70,7 +68,6 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
             Log.d(TAG, String.format("Binding movie [%s]", movie.title));
 
             mMovieTitleTextView.setText(movie.title);
-            mMovieRating.setText(String.format(mRatingText, movie.vote_average));
 
             Uri imageUri = new Uri.Builder()
                     .scheme("http")
@@ -123,7 +120,7 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
         holder.bind(mMovies.get(position));
     }
 
-    public int getmCurrentPage() {
-        return mCurrentPage;
+    public ArrayList<Movie> getMovies(){
+        return this.mMovies;
     }
 }

@@ -21,6 +21,8 @@ import com.guskuma.tmdbapi.MovieResultSet;
 import com.guskuma.tmdbapi.TMDbAdapter;
 import com.guskuma.tmdbapi.TMDbService;
 
+import java.util.List;
+
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -130,4 +132,21 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mToast.show();
         mFetchProgress.setVisibility(View.INVISIBLE);
     }
+
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//
+//        outState.putParcelableArrayList("moviesList", mTMDbAdapter.getMovies());
+//        outState.putInt("currentPage", currentPage);
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//
+//        List<Movie> movies = savedInstanceState.getParcelableArrayList("moviesList");
+//        currentPage = savedInstanceState.getInt("currentPage");
+//        mTMDbAdapter = new TMDbAdapter(this, movies);
+//    }
 }

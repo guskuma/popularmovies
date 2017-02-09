@@ -9,6 +9,8 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,8 +32,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
+    private static final String TAG = MovieDetailActivity.class.getSimpleName();
+
     @BindView(R.id.tv_movie_title) TextView mMovieTitle;
+    @BindView(R.id.tv_movie_original_title) TextView mMovieOriginalTitle;
+    @BindView(R.id.tv_movie_rating) TextView mMovieRating;
+    @BindView(R.id.tv_movie_release_date) TextView mMovieReleaseDate;
     @BindView(R.id.tv_movie_overview) TextView mMovieOverview;
+    @BindView(R.id.iv_movie_poster) ImageView mMoviePoster;
     @BindView(R.id.iv_movie_backdrop) ImageView mMovieBackdrop;
     @BindView(R.id.toolbar_layout) CollapsingToolbarLayout mCollapsingToolbarLayout;
     @BindView(R.id.app_bar) AppBarLayout mAppBarLayout;
@@ -51,21 +59,25 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         mMovieOverview.setText(mMovie.overview);
         mMovieTitle.setText(mMovie.title);
+        mMovieOriginalTitle.setText(Html.fromHtml("<b>Original title:</b><br>" + mMovie.original_title));
+        mMovieRating.setText(Html.fromHtml("<b>Rating:</b><br>" + mMovie.vote_average + " of 10 (" + mMovie.vote_count + " votes)"));
+        mMovieReleaseDate.setText(Html.fromHtml("<b>Release date:</b><br>" + mMovie.release_date));
 
-        mCollapsingToolbarLayout.setTitle(mMovie.title);
         mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                Log.d(TAG, "Offset: " + String.valueOf(verticalOffset));
+                Log.d(TAG, "Calc: " + String.valueOf(-mCollapsingToolbarLayout.getHeight() + mToolbar.getHeight()));
                 if (verticalOffset == -mCollapsingToolbarLayout.getHeight() + mToolbar.getHeight()) {
-                    mMovieTitle.setVisibility(View.GONE);
+                    mMovieTitle.setVisibility(View.INVISIBLE);
                 } else {
                     mMovieTitle.setVisibility(View.VISIBLE);
                 }
             }
         });
 
-        getMovieBackdrop();
+        getMovieImages();
         getMovieDetails();
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -98,8 +110,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void getMovieBackdrop() {
-        Uri imageUri = new Uri.Builder()
+    private void getMovieImages() {
+        Uri backdropUri = new Uri.Builder()
                 .scheme("http")
                 .authority("image.tmdb.org")
                 .appendPath("t")
@@ -108,7 +120,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 .appendPath(mMovie.backdrop_path.replace("/", ""))
                 .build();
 
-        Picasso.with(this).load(imageUri.toString()).into(mMovieBackdrop, new com.squareup.picasso.Callback() {
+        Picasso.with(this).load(backdropUri.toString()).into(mMovieBackdrop, new com.squareup.picasso.Callback() {
             @Override
             public void onSuccess() {
                 Bitmap bitmap = ((BitmapDrawable) mMovieBackdrop.getDrawable()).getBitmap();
@@ -124,6 +136,17 @@ public class MovieDetailActivity extends AppCompatActivity {
 
             }
         });
+
+        Uri posterUri = new Uri.Builder()
+                .scheme("http")
+                .authority("image.tmdb.org")
+                .appendPath("t")
+                .appendPath("p")
+                .appendPath("w185")
+                .appendPath(mMovie.poster_path.replace("/", ""))
+                .build();
+
+        Picasso.with(this).load(posterUri.toString()).into(mMoviePoster);
     }
 
     private void applyPalette(Palette palette) {

@@ -42,7 +42,7 @@ public class Movie implements Parcelable {
     public String poster_path;
     public boolean adult;
     public String overview;
-    public String date;
+    public String release_date;
     public Integer[] genre_id;
     public int id;
     public String original_title;
@@ -65,7 +65,7 @@ public class Movie implements Parcelable {
         dest.writeString(this.poster_path);
         dest.writeByte(this.adult ? (byte) 1 : (byte) 0);
         dest.writeString(this.overview);
-        dest.writeString(this.date);
+        dest.writeString(this.release_date);
         dest.writeArray(this.genre_id);
         dest.writeInt(this.id);
         dest.writeString(this.original_title);
@@ -82,7 +82,7 @@ public class Movie implements Parcelable {
         this.poster_path = in.readString();
         this.adult = in.readByte() != 0;
         this.overview = in.readString();
-        this.date = in.readString();
+        this.release_date = in.readString();
         this.genre_id = (Integer[]) in.readArray(Integer[].class.getClassLoader());
         this.id = in.readInt();
         this.original_title = in.readString();
