@@ -1,14 +1,25 @@
 package com.guskuma.popularmovies;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +34,7 @@ import com.guskuma.tmdbapi.TMDbService;
 
 import java.util.List;
 
+import butterknife.BindArray;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,9 +50,16 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @BindView(R.id.rv_movies_list) RecyclerView mMoviesList;
     @BindView(R.id.pb_fetching)    ProgressBar mFetchProgress;
     @BindView(R.id.tv_empty_list)  TextView mEmptyMessage;
-
     @BindString(R.string.fetch_fail) String toastMessage;
+    @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
+    @BindView(R.id.left_drawer) ListView mDrawerList;
+    @BindArray(R.array.navigation_drawer_list)  String[] mDrawerOptions;
+    @BindView(R.id.my_toolbar) Toolbar mToolbar;
 
+    @BindString(R.string.pref_movies_to_show_key) String mPrefKey;
+
+    SharedPreferences sharedPref;
+    ActionBarDrawerToggle mDrawerToggle;
     TMDbService mMovieService;
     TMDbAdapter mTMDbAdapter;
     EndlessRecyclerViewScrollListener mEndlessScrollListener;
@@ -49,8 +68,48 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.navigation_drawer_layout);
         ButterKnife.bind(this);
+
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle(MovieFilterDescriptor.getDescription(sharedPref.getString(mPrefKey, "popular")));
+
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, mDrawerOptions));
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mDrawerList.setItemChecked(position, true);
+                mDrawerLayout.closeDrawer(mDrawerList);
+                Intent i = new Intent(view.getContext(), SettingsActivity.class);
+                startActivity(i);
+            }
+        });
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.string.pref_header_general,  /* "open drawer" description */
+                R.string.rating  /* "close drawer" description */
+        ) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         Gson gson = new GsonBuilder().setLenient().create();
         mMovieService = new Retrofit.Builder()
@@ -75,6 +134,33 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
         mMoviesList.addOnScrollListener(mEndlessScrollListener);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -101,14 +187,16 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     public void fetchMoviesList(int pageToLoad){
 
-        Call<MovieResultSet> call = mMovieService.getMoviesList(MovieFilterDescriptor.POPULAR, "e8a6c51fc482352ed4caed9cb105552f", "en-US", pageToLoad);
+        String movieCategoryToFetch = sharedPref.getString(mPrefKey, MovieFilterDescriptor.POPULAR);
+
+        Call<MovieResultSet> call = mMovieService.getMoviesList(MovieFilterDescriptor.valueOf(movieCategoryToFetch), "e8a6c51fc482352ed4caed9cb105552f", "en-US", pageToLoad);
         call.enqueue(this);
         mFetchProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onResponse(Call<MovieResultSet> call, Response<MovieResultSet> response) {
-        if(response.isSuccessful()) {
+        if(response.isSuccessful() && response.body().results != null) {
             MovieResultSet movieResultSet = response.body();
             Log.d(TAG, String.format("%s movies fetched (page %s)", movieResultSet.results.size(), movieResultSet.page));
             mTMDbAdapter.addMovies(movieResultSet.page, movieResultSet.results);

@@ -30,4 +30,39 @@ public class MovieFilterDescriptor {
     public MovieFilterDescriptor(@MovieFilterDef String movieFilter) {
         this.movieFilter = movieFilter;
     }
+
+    public static @MovieFilterDef String valueOf(String value){
+        switch (value){
+            case LATEST:
+                return LATEST;
+            case NOW_PLAYING:
+                return NOW_PLAYING;
+            case POPULAR:
+                return POPULAR;
+            case TOP_RATED:
+                return TOP_RATED;
+            case UPCOMING:
+                return UPCOMING;
+            default:
+                return null;
+        }
+    }
+
+    public static String getDescription(String value){
+        switch (value){
+            case LATEST:
+                return "Latest Movies";
+            case NOW_PLAYING:
+                return "Now Playing Movies";
+            case POPULAR:
+                return "Popular Movies";
+            case TOP_RATED:
+                return "Top Rated Movies";
+            case UPCOMING:
+                return "Upcoming Movies";
+            default:
+                return null;
+        }
+    }
+
 }

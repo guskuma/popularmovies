@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
@@ -44,6 +45,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     @BindView(R.id.toolbar_layout) CollapsingToolbarLayout mCollapsingToolbarLayout;
     @BindView(R.id.app_bar) AppBarLayout mAppBarLayout;
     @BindView(R.id.toolbar) Toolbar mToolbar;
+    @BindView(R.id.sv_movie_detail) NestedScrollView mMovieDetailNestedScrollView;
     Movie mMovie;
     TMDbService mMovieService;
 
@@ -64,18 +66,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         mMovieReleaseDate.setText(Html.fromHtml("<b>Release date:</b><br>" + mMovie.release_date));
 
         mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-        mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                Log.d(TAG, "Offset: " + String.valueOf(verticalOffset));
-                Log.d(TAG, "Calc: " + String.valueOf(-mCollapsingToolbarLayout.getHeight() + mToolbar.getHeight()));
-                if (verticalOffset == -mCollapsingToolbarLayout.getHeight() + mToolbar.getHeight()) {
-                    mMovieTitle.setVisibility(View.INVISIBLE);
-                } else {
-                    mMovieTitle.setVisibility(View.VISIBLE);
-                }
-            }
-        });
 
         getMovieImages();
         getMovieDetails();
@@ -152,9 +142,12 @@ public class MovieDetailActivity extends AppCompatActivity {
     private void applyPalette(Palette palette) {
         int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
         int primary = getResources().getColor(R.color.colorPrimary);
+        int backgroundLight = getResources().getColor(R.color.colorBackgroundLight);
         mCollapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
         mCollapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
         mCollapsingToolbarLayout.setBackgroundColor(palette.getDarkMutedColor(primaryDark));
+        mMovieTitle.setTextColor(palette.getDarkMutedColor(primaryDark));
+        mMovieDetailNestedScrollView.setBackgroundColor(palette.getLightMutedColor(backgroundLight));
         supportStartPostponedEnterTransition();
     }
 }
