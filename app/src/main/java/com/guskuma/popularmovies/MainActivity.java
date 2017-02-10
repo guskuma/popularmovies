@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
                 .build()
                 .create(TMDbService.class);
 
-        fetchMoviesList(1);
+        mTMDbAdapter = new TMDbAdapter(this);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, calculateNumRows(), LinearLayoutManager.VERTICAL, false);
         mMoviesList.setLayoutManager(layoutManager);
@@ -77,6 +77,14 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(mTMDbAdapter.getMovies().size() == 0)
+            fetchMoviesList(1);
+    }
+
     private int calculateNumRows(){
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -92,9 +100,6 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     }
 
     public void fetchMoviesList(int pageToLoad){
-        if(mTMDbAdapter == null){
-            mTMDbAdapter = new TMDbAdapter(this);
-        }
 
         Call<MovieResultSet> call = mMovieService.getMoviesList(MovieFilterDescriptor.POPULAR, "e8a6c51fc482352ed4caed9cb105552f", "en-US", pageToLoad);
         call.enqueue(this);
@@ -105,8 +110,8 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     public void onResponse(Call<MovieResultSet> call, Response<MovieResultSet> response) {
         if(response.isSuccessful()) {
             MovieResultSet movieResultSet = response.body();
+            Log.d(TAG, String.format("%s movies fetched (page %s)", movieResultSet.results.size(), movieResultSet.page));
             mTMDbAdapter.addMovies(movieResultSet.page, movieResultSet.results);
-
             toggleViewsVisibility(true);
         } else {
             toggleViewsVisibility(false);
@@ -133,20 +138,21 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mFetchProgress.setVisibility(View.INVISIBLE);
     }
 
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//
-//        outState.putParcelableArrayList("moviesList", mTMDbAdapter.getMovies());
-//        outState.putInt("currentPage", currentPage);
-//    }
-//
-//    @Override
-//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//
-//        List<Movie> movies = savedInstanceState.getParcelableArrayList("moviesList");
-//        currentPage = savedInstanceState.getInt("currentPage");
-//        mTMDbAdapter = new TMDbAdapter(this, movies);
-//    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelableArrayList("moviesList", mTMDbAdapter.getMovies());
+        outState.putInt("currentPage", mEndlessScrollListener.getCurrentPage());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        List<Movie> movies = savedInstanceState.getParcelableArrayList("moviesList");
+        int currentPage = savedInstanceState.getInt("currentPage");
+        mTMDbAdapter.addMovies(currentPage, movies);
+        mEndlessScrollListener.setCurrentPage(currentPage);
+    }
 }

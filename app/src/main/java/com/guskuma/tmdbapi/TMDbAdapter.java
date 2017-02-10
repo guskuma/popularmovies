@@ -2,6 +2,7 @@ package com.guskuma.tmdbapi;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,7 +29,7 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
 
     String TAG = TMDbAdapter.class.getSimpleName();
 
-    private int mCurrentPage;
+    //private int mCurrentPage;
     private MovieItemClickListener mClickListener;
     ArrayList<Movie> mMovies = new ArrayList<>();
 
@@ -36,9 +37,9 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
         mClickListener = listener;
     }
 
-    public void addMovies(int pageNumber, List<Movie> moviesToAdd){
-        if(pageNumber > mCurrentPage) {
-            mCurrentPage = pageNumber;
+    public void addMovies(int pageNumber, @NonNull List<Movie> moviesToAdd){
+        if(moviesToAdd.size() >0) {
+            //mCurrentPage = pageNumber;
             mMovies.addAll(moviesToAdd);
             notifyDataSetChanged();
             Log.d(TAG, String.format("%s movies addes (page %s)", moviesToAdd.size(), pageNumber));
