@@ -29,7 +29,6 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
 
     String TAG = TMDbAdapter.class.getSimpleName();
 
-    //private int mCurrentPage;
     private MovieItemClickListener mClickListener;
     ArrayList<Movie> mMovies = new ArrayList<>();
 
@@ -123,5 +122,9 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
 
     public ArrayList<Movie> getMovies(){
         return this.mMovies;
+    }
+
+    public void reset(){
+        this.mMovies = new ArrayList<>();
     }
 }

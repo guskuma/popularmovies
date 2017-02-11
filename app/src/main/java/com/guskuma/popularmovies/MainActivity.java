@@ -1,10 +1,7 @@
 package com.guskuma.popularmovies;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -52,13 +50,13 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @BindView(R.id.tv_empty_list)  TextView mEmptyMessage;
     @BindString(R.string.fetch_fail) String toastMessage;
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
-    @BindView(R.id.left_drawer) ListView mDrawerList;
+    @BindView(R.id.drawer_menu) LinearLayout mDrawerMenu;
+    @BindView(R.id.drawer_list) ListView mDrawerList;
     @BindArray(R.array.navigation_drawer_list)  String[] mDrawerOptions;
+    @BindArray(R.array.navigation_drawer_list_values)  String[] mDrawerOptionsValue;
     @BindView(R.id.my_toolbar) Toolbar mToolbar;
 
-    @BindString(R.string.pref_movies_to_show_key) String mPrefKey;
-
-    SharedPreferences sharedPref;
+    String mMovieCategory;
     ActionBarDrawerToggle mDrawerToggle;
     TMDbService mMovieService;
     TMDbAdapter mTMDbAdapter;
@@ -68,45 +66,29 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.navigation_drawer_layout);
+        setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(MovieFilterDescriptor.getDescription(sharedPref.getString(mPrefKey, "popular")));
 
         // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, mDrawerOptions));
+                R.layout.drawer_menu_item, mDrawerOptions));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mDrawerList.setItemChecked(position, true);
-                mDrawerLayout.closeDrawer(mDrawerList);
-                Intent i = new Intent(view.getContext(), SettingsActivity.class);
-                startActivity(i);
+                mDrawerLayout.closeDrawer(mDrawerMenu);
+                changeMovieCategory(mDrawerOptionsValue[position]);
             }
         });
 
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
-                R.string.pref_header_general,  /* "open drawer" description */
-                R.string.rating  /* "close drawer" description */
-        ) {
-
-            /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-            }
-
-            /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-            }
-        };
+                R.string.drawer_open,  /* "open drawer" description */
+                R.string.drawer_closed  /* "close drawer" description */
+        ) { };
 
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -137,6 +119,18 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        changeMovieCategory(MovieFilterDescriptor.POPULAR);
+
+    }
+
+    private void changeMovieCategory(String newCategory) {
+        if(mMovieCategory == null || !mMovieCategory.equals(newCategory)) {
+            mMovieCategory = newCategory;
+            getSupportActionBar().setTitle(MovieFilterDescriptor.getDescription(mMovieCategory));
+            mTMDbAdapter.reset();
+            mEndlessScrollListener.resetState();
+            fetchMoviesList(1);
+        }
     }
 
     @Override
@@ -180,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     @Override
     public void onListItemClick(Movie movie) {
+        Log.d(TAG, String.format("Movie clicked: %s", movie.toString()));
         Intent i = new Intent(this, MovieDetailActivity.class);
         i.putExtra(Movie.EXTRA_NAME, movie);
         startActivity(i);
@@ -187,9 +182,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     public void fetchMoviesList(int pageToLoad){
 
-        String movieCategoryToFetch = sharedPref.getString(mPrefKey, MovieFilterDescriptor.POPULAR);
-
-        Call<MovieResultSet> call = mMovieService.getMoviesList(MovieFilterDescriptor.valueOf(movieCategoryToFetch), "e8a6c51fc482352ed4caed9cb105552f", "en-US", pageToLoad);
+        Call<MovieResultSet> call = mMovieService.getMoviesList(MovieFilterDescriptor.valueOf(mMovieCategory), "e8a6c51fc482352ed4caed9cb105552f", "en-US", pageToLoad);
         call.enqueue(this);
         mFetchProgress.setVisibility(View.VISIBLE);
     }
@@ -232,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
         outState.putParcelableArrayList("moviesList", mTMDbAdapter.getMovies());
         outState.putInt("currentPage", mEndlessScrollListener.getCurrentPage());
+        outState.putString("movieCategory", mMovieCategory);
     }
 
     @Override
@@ -240,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
         List<Movie> movies = savedInstanceState.getParcelableArrayList("moviesList");
         int currentPage = savedInstanceState.getInt("currentPage");
+        changeMovieCategory(savedInstanceState.getString("movieCategory", MovieFilterDescriptor.POPULAR));
         mTMDbAdapter.addMovies(currentPage, movies);
         mEndlessScrollListener.setCurrentPage(currentPage);
     }

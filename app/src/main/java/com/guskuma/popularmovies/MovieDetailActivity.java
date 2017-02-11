@@ -68,36 +68,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
 
         getMovieImages();
-        getMovieDetails();
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    private void getMovieDetails() {
-        Gson gson = new GsonBuilder().setLenient().create();
-        mMovieService = new Retrofit.Builder()
-                .baseUrl(TMDbService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build()
-                .create(TMDbService.class);
-
-        Call<DetailedMovie> call = mMovieService.getMovieDetail(mMovie.id, "e8a6c51fc482352ed4caed9cb105552f", "en-US");
-        call.enqueue(new Callback<DetailedMovie>() {
-            @Override
-            public void onResponse(Call<DetailedMovie> call, Response<DetailedMovie> response) {
-                if(response.isSuccessful()) {
-                    DetailedMovie detailedMovie = response.body();
-
-                } else {
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DetailedMovie> call, Throwable t) {
-
-            }
-        });
     }
 
     private void getMovieImages() {
