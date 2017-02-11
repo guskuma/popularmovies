@@ -1,7 +1,11 @@
 package com.guskuma.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -43,8 +47,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements Callback<MovieResultSet>, TMDbAdapter.MovieItemClickListener {
+
     String TAG = MainActivity.class.getSimpleName();
 
+    @BindString(R.string.tmdb_api_key) String TMDB_API_KEY;
     @BindView(R.id.rv_movies_list) RecyclerView mMoviesList;
     @BindView(R.id.pb_fetching)    ProgressBar mFetchProgress;
     @BindView(R.id.tv_empty_list)  TextView mEmptyMessage;
@@ -55,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @BindArray(R.array.navigation_drawer_list)  String[] mDrawerOptions;
     @BindArray(R.array.navigation_drawer_list_values)  String[] mDrawerOptionsValue;
     @BindView(R.id.my_toolbar) Toolbar mToolbar;
+
+    int mImageWidth = 185;
 
     String mMovieCategory;
     ActionBarDrawerToggle mDrawerToggle;
@@ -79,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mDrawerList.setItemChecked(position, true);
                 mDrawerLayout.closeDrawer(mDrawerMenu);
-                changeMovieCategory(mDrawerOptionsValue[position]);
+                changeMovieCategory(mDrawerOptionsValue[position], true);
             }
         });
 
@@ -91,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         ) { };
 
         // Set the drawer toggle as the DrawerListener
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         Gson gson = new GsonBuilder().setLenient().create();
         mMovieService = new Retrofit.Builder()
@@ -100,11 +108,11 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
                 .build()
                 .create(TMDbService.class);
 
-        mTMDbAdapter = new TMDbAdapter(this);
-
-        GridLayoutManager layoutManager = new GridLayoutManager(this, calculateNumRows(), LinearLayoutManager.VERTICAL, false);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, calculateNumItensInRows(0), LinearLayoutManager.VERTICAL, false);
         mMoviesList.setLayoutManager(layoutManager);
         mMoviesList.setHasFixedSize(false);
+
+        mTMDbAdapter = new TMDbAdapter(this, mImageWidth);
         mMoviesList.setAdapter(mTMDbAdapter);
 
         mEndlessScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
@@ -119,17 +127,23 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        changeMovieCategory(MovieFilterDescriptor.POPULAR);
+        mMovieCategory = MovieFilterDescriptor.POPULAR;
 
     }
 
-    private void changeMovieCategory(String newCategory) {
+    private void changeMovieCategory(@NonNull String newCategory, boolean reset) {
+
+        getSupportActionBar().setTitle(MovieFilterDescriptor.getDescription(newCategory));
+
         if(mMovieCategory == null || !mMovieCategory.equals(newCategory)) {
             mMovieCategory = newCategory;
-            getSupportActionBar().setTitle(MovieFilterDescriptor.getDescription(mMovieCategory));
-            mTMDbAdapter.reset();
-            mEndlessScrollListener.resetState();
-            fetchMoviesList(1);
+
+            if(reset) {
+                mTMDbAdapter.reset();
+                mEndlessScrollListener.resetState();
+                mMoviesList.scrollToPosition(0);
+                fetchMoviesList(1);
+            }
         }
     }
 
@@ -161,14 +175,26 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     protected void onResume() {
         super.onResume();
 
-        if(mTMDbAdapter.getMovies().size() == 0)
+        // Fetches only if there´s no movies loaded
+        if(mTMDbAdapter.getMovies().size() == 0) {
+            changeMovieCategory(mMovieCategory, true);
             fetchMoviesList(1);
+        } else {
+            changeMovieCategory(mMovieCategory, false);
+        }
     }
 
-    private int calculateNumRows(){
+    private int calculateNumItensInRows(int border){
+
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int noOfColumns = (int) (dpWidth / 185);
+        int noOfColumns = (int) (dpWidth / (mImageWidth + border));
+
+        if(noOfColumns <= 1){
+            mImageWidth = mImageWidth - 10;
+            return calculateNumItensInRows(20);
+        }
+
         return noOfColumns;
     }
 
@@ -180,11 +206,21 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         startActivity(i);
     }
 
-    public void fetchMoviesList(int pageToLoad){
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 
-        Call<MovieResultSet> call = mMovieService.getMoviesList(MovieFilterDescriptor.valueOf(mMovieCategory), "e8a6c51fc482352ed4caed9cb105552f", "en-US", pageToLoad);
-        call.enqueue(this);
-        mFetchProgress.setVisibility(View.VISIBLE);
+    public void fetchMoviesList(int pageToLoad){
+        if(isOnline()) {
+            Call<MovieResultSet> call = mMovieService.getMoviesList(MovieFilterDescriptor.valueOf(mMovieCategory), TMDB_API_KEY, "en-US", pageToLoad);
+            call.enqueue(this);
+            mFetchProgress.setVisibility(View.VISIBLE);
+        } else {
+            toggleViewsVisibility(false);
+        }
     }
 
     @Override
@@ -197,9 +233,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         } else {
             toggleViewsVisibility(false);
         }
-
         mFetchProgress.setVisibility(View.INVISIBLE);
-
     }
 
     private void toggleViewsVisibility(boolean success) {
@@ -234,8 +268,9 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
         List<Movie> movies = savedInstanceState.getParcelableArrayList("moviesList");
         int currentPage = savedInstanceState.getInt("currentPage");
-        changeMovieCategory(savedInstanceState.getString("movieCategory", MovieFilterDescriptor.POPULAR));
+        String movieCategory = savedInstanceState.getString("movieCategory", MovieFilterDescriptor.POPULAR);
         mTMDbAdapter.addMovies(currentPage, movies);
         mEndlessScrollListener.setCurrentPage(currentPage);
+        mMovieCategory = movieCategory;
     }
 }

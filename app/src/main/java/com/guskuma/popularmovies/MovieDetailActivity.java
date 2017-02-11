@@ -47,8 +47,6 @@ public class MovieDetailActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.sv_movie_detail) NestedScrollView mMovieDetailNestedScrollView;
     Movie mMovie;
-    TMDbService mMovieService;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +64,14 @@ public class MovieDetailActivity extends AppCompatActivity {
         mMovieReleaseDate.setText(Html.fromHtml("<b>Release date:</b><br>" + mMovie.release_date));
 
         mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+
+//        Rect scrollBounds = new Rect();
+//        scrollView.getHitRect(scrollBounds);
+//        if (imageView.getLocalVisibleRect(scrollBounds)) {
+//            // Any portion of the imageView, even a single pixel, is within the visible window
+//        } else {
+//            // NONE of the imageView is within the visible window
+//        }
 
         getMovieImages();
         setSupportActionBar(mToolbar);

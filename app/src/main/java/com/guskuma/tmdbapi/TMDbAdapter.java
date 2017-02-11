@@ -3,6 +3,7 @@ package com.guskuma.tmdbapi;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.guskuma.Utils;
 import com.guskuma.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
@@ -29,11 +31,13 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
 
     String TAG = TMDbAdapter.class.getSimpleName();
 
+    private Integer mImageWidth = null;
     private MovieItemClickListener mClickListener;
     ArrayList<Movie> mMovies = new ArrayList<>();
 
-    public TMDbAdapter(MovieItemClickListener listener){
+    public TMDbAdapter(MovieItemClickListener listener, int imageWidth){
         mClickListener = listener;
+        mImageWidth = imageWidth;
     }
 
     public void addMovies(int pageNumber, @NonNull List<Movie> moviesToAdd){
@@ -46,6 +50,7 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
     }
 
     public class MovieItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        @BindView(R.id.cv_movie_card) CardView mMovieCard;
         @BindView(R.id.iv_movie_poster) ImageView mMoviePosterImageView;
         @BindView(R.id.tv_movie_title)TextView mMovieTitleTextView;
 
@@ -69,16 +74,20 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
 
             mMovieTitleTextView.setText(movie.title);
 
-            Uri imageUri = new Uri.Builder()
-                    .scheme("http")
-                    .authority("image.tmdb.org")
-                    .appendPath("t")
-                    .appendPath("p")
-                    .appendPath("w185")
-                    .appendPath(movie.poster_path.replace("/", ""))
-                    .build();
+            if(movie.poster_path != null) {
+                Uri imageUri = new Uri.Builder()
+                        .scheme("http")
+                        .authority("image.tmdb.org")
+                        .appendPath("t")
+                        .appendPath("p")
+                        .appendPath("w185")
+                        .appendPath(movie.poster_path.replace("/", ""))
+                        .build();
 
-            Picasso.with(itemView.getContext()).load(imageUri.toString()).into(mMoviePosterImageView);
+                mMovieCard.getLayoutParams().width = Utils.toPxValue(itemView.getContext(), mImageWidth);
+                mMoviePosterImageView.getLayoutParams().width = Utils.toPxValue(itemView.getContext(), mImageWidth);
+                mMoviePosterImageView.getLayoutParams().height = Utils.toPxValue(itemView.getContext(), Double.valueOf(mImageWidth * 1.5027).intValue());
+                Picasso.with(itemView.getContext()).load(imageUri.toString()).into(mMoviePosterImageView);
 //            Picasso.Builder builder = new Picasso.Builder(itemView.getContext());
 //            builder.listener(new Picasso.Listener()
 //            {
@@ -89,6 +98,7 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
 //                }
 //            });
 //            builder.build().load(imageUri.toString()).into(mMoviePosterImageView);
+            }
         }
 
     }
@@ -122,6 +132,10 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
 
     public ArrayList<Movie> getMovies(){
         return this.mMovies;
+    }
+
+    public void setImageWidth(int mImageWidth) {
+        this.mImageWidth = mImageWidth;
     }
 
     public void reset(){

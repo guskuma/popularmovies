@@ -33,6 +33,8 @@
             android:text="@string/empty_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:padding="16dp"
             android:layout_gravity="center_horizontal|top"
             android:visibility="invisible"/>
 
@@ -60,7 +62,7 @@
             android:padding="16dp"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
             android:textStyle="bold"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/colorBackgroundLight"
             android:background="@color/colorPrimary"
             android:text="@string/movies_category"/>
 
