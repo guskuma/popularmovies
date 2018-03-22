@@ -1,11 +1,18 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="empty_list">No movie retrieved, please check your internet connection</string>
+    <string name="try_again">Try again</string>
     <string name="fetch_fail">Movies list could not be fetched</string>
-    <string name="rating">Rating: %s of 10</string>
     <string name="drawer_open">Navigation drawer opened</string>
     <string name="drawer_closed">Navigation drawer closed</string>
     <string name="movies_category">Categories</string>
+    <string name="original_title">Original title: </string>
+    <string name="release_date">Release date: </string>
+    <string name="rating">Rating: </string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="trailers">Trailers</string>
+    <string name="play_trailer">Play Trailer</string>
+    <string name="reviews">Reviews</string>
 
     <string-array name="navigation_drawer_list">
         <item>Popular Movies</item>

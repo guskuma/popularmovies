@@ -21,4 +21,12 @@ public interface TMDbService {
     @GET("3/movie/{movie_id}")
     Call<DetailedMovie> getMovieDetail(@Path("movie_id") int movieId, @Query("api_key") String apiKey, @Query("language")String language);
 
+    //https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key=<<api_key>>&language=en-US
+    @GET("3/movie/{movie_id}/videos")
+    Call<VideoResultSet> getMovieVideos(@Path("movie_id") int movieId, @Query("api_key") String apiKey, @Query("language")String language);
+
+    //https://api.themoviedb.org/3/movie/{movie_id}/reviews?api_key=<<api_key>>&language=en-US&page=1
+    @GET("3/movie/{movie_id}/reviews")
+    Call<ReviewResultSet> getMovieReviews(@Path("movie_id") int movieId, @Query("api_key") String apiKey, @Query("language")String language, @Query("page") int page);
+
 }

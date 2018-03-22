@@ -5,7 +5,6 @@
     android:id="@+id/sv_movie_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="16dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.guskuma.popularmovies.MovieDetailActivity"
     tools:showIn="@layout/activity_movie_detail" >
@@ -17,90 +16,83 @@
         android:orientation="vertical">
 
         <ImageView
+            android:id="@+id/iv_movie_poster"
+            android:layout_width="185dp"
+            android:layout_height="278dp"
+            android:contentDescription="@string/movie_poster"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
             android:id="@+id/iv_favorite"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/tv_movie_title"
+            tools:text="Lorem Ipsum Dolor"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_favorite"
+            android:layout_marginLeft="@dimen/text_margin"
+            android:layout_marginStart="@dimen/text_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/text_margin"
-            android:layout_marginLeft="@dimen/text_margin"
-            android:textColor="#000"
-            android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/iv_favorite"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Lorem Ipsum Dolor" />
+            android:textColor="#000"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/tv_movie_overview"
-            tools:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-            app:layout_constraintTop_toBottomOf="@id/tv_movie_title"
-            app:layout_constraintLeft_toLeftOf="@id/iv_favorite"
-            android:layout_marginTop="@dimen/between_text_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"/>
-
-        <ImageView
-            android:id="@+id/iv_movie_poster"
-            android:contentDescription="@string/movie_poster"
-            app:layout_constraintTop_toBottomOf="@id/tv_movie_overview"
-            app:layout_constraintLeft_toLeftOf="@id/tv_movie_overview"
-            android:layout_marginTop="@dimen/text_margin"
-            android:layout_width="157dp"
-            android:layout_height="236dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
+            android:layout_marginLeft="@dimen/text_margin"
+            android:layout_marginStart="@dimen/text_margin"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toRightOf="@id/iv_movie_poster"
+            app:layout_constraintTop_toBottomOf="@id/tv_movie_title"
+            tools:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." />
 
         <TextView
             android:id="@+id/lbl_movie_original_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/text_margin"
+            android:layout_marginTop="@dimen/text_margin"
             android:layout_marginLeft="@dimen/text_margin"
             android:text="@string/original_title"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
-            app:layout_constraintTop_toTopOf="@id/iv_movie_poster" />
+            app:layout_constraintTop_toBottomOf="@id/tv_movie_overview"/>
 
         <TextView
             android:id="@+id/tv_movie_original_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="@dimen/text_margin"
-            android:layout_marginStart="@dimen/text_margin"
-            app:layout_constraintLeft_toRightOf="@id/iv_movie_poster"
-            app:layout_constraintTop_toBottomOf="@id/lbl_movie_original_title"
+            android:layout_marginStart="@dimen/between_text_horizontal"
+            android:layout_marginLeft="@dimen/between_text_horizontal"
+            app:layout_constraintStart_toEndOf="@id/lbl_movie_original_title"
+            app:layout_constraintTop_toTopOf="@id/lbl_movie_original_title"
             tools:text="Lorem Ipsum Dolor" />
 
         <TextView
             android:id="@+id/lbl_movie_rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/text_margin"
-            android:layout_marginLeft="@dimen/text_margin"
             android:layout_marginTop="@dimen/between_text_vertical"
             android:text="@string/rating"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
-            app:layout_constraintTop_toBottomOf="@id/tv_movie_original_title" />
+            app:layout_constraintStart_toStartOf="@id/lbl_movie_original_title"
+            app:layout_constraintTop_toBottomOf="@id/lbl_movie_original_title" />
 
         <TextView
             android:id="@+id/tv_movie_rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_movie_original_title"
-            android:layout_marginStart="@dimen/text_margin"
-            android:layout_marginLeft="@dimen/text_margin"
-            app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
-            app:layout_constraintTop_toBottomOf="@id/lbl_movie_rating"
+            android:layout_marginStart="@dimen/between_text_horizontal"
+            android:layout_marginLeft="@dimen/between_text_horizontal"
+            app:layout_constraintStart_toEndOf="@id/lbl_movie_rating"
+            app:layout_constraintTop_toTopOf="@id/lbl_movie_rating"
             tools:text="7.7 of 10 (1000 votes)" />
 
         <TextView
@@ -109,21 +101,18 @@
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/text_margin"
-            android:layout_marginLeft="@dimen/text_margin"
             android:layout_marginTop="@dimen/between_text_vertical"
-            app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
-            app:layout_constraintTop_toBottomOf="@id/tv_movie_rating"/>
+            app:layout_constraintStart_toStartOf="@id/lbl_movie_original_title"
+            app:layout_constraintTop_toBottomOf="@id/lbl_movie_rating"/>
 
         <TextView
             android:id="@+id/tv_movie_release_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_movie_rating"
-            android:layout_marginStart="@dimen/text_margin"
-            android:layout_marginLeft="@dimen/text_margin"
-            app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
-            app:layout_constraintTop_toBottomOf="@id/lbl_movie_release_date"
+            android:layout_marginStart="@dimen/between_text_horizontal"
+            android:layout_marginLeft="@dimen/between_text_horizontal"
+            app:layout_constraintStart_toEndOf="@id/lbl_movie_release_date"
+            app:layout_constraintTop_toTopOf="@id/lbl_movie_release_date"
             tools:text="2017-10-25" />
 
         <TextView

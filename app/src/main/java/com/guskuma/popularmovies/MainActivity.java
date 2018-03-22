@@ -5,11 +5,11 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,10 +20,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -40,6 +40,7 @@ import butterknife.BindArray;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,7 +54,8 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @BindString(R.string.tmdb_api_key) String TMDB_API_KEY;
     @BindView(R.id.rv_movies_list) RecyclerView mMoviesList;
     @BindView(R.id.pb_fetching)    ProgressBar mFetchProgress;
-    @BindView(R.id.tv_empty_list)  TextView mEmptyMessage;
+    @BindView(R.id.no_connection_view)  View mEmptyScreen;
+    @BindView(R.id.bt_try_again) Button mTryAgainButton;
     @BindString(R.string.fetch_fail) String toastMessage;
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
     @BindView(R.id.drawer_menu) LinearLayout mDrawerMenu;
@@ -237,8 +239,10 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     }
 
     private void toggleViewsVisibility(boolean success) {
-        mEmptyMessage.setVisibility(success ? View.INVISIBLE : View.VISIBLE);
+        mEmptyScreen.setVisibility(success ? View.INVISIBLE : View.VISIBLE);
         mMoviesList.setVisibility(success ? View.VISIBLE : View.INVISIBLE);
+
+
     }
 
     @Override
@@ -272,5 +276,10 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mTMDbAdapter.addMovies(currentPage, movies);
         mEndlessScrollListener.setCurrentPage(currentPage);
         mMovieCategory = movieCategory;
+    }
+
+    @OnClick(R.id.bt_try_again)
+    public void tryAgain(Button button){
+        fetchMoviesList(1);
     }
 }

@@ -28,15 +28,31 @@
             android:background="@color/colorBackgroundLight"
             android:visibility="visible"/>
 
-        <TextView
-            android:id="@+id/tv_empty_list"
-            android:text="@string/empty_list"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/no_connection_view"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:padding="16dp"
+            android:visibility="invisible"
             android:layout_gravity="center_horizontal|top"
-            android:visibility="invisible"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_empty_list"
+                android:text="@string/empty_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:padding="16dp" />
+
+            <Button
+                android:id="@+id/bt_try_again"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/try_again"
+                android:layout_gravity="center"
+                android:padding="16dp"/>
+
+        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/pb_fetching"

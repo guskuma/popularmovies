@@ -11,32 +11,6 @@ import java.util.Arrays;
 
 public class Movie implements Parcelable {
 
-    /* REST
-    {
-        "poster_path": "/WLQN5aiQG8wc9SeKwixW7pAR8K.jpg",
-        "adult": false,
-        "overview": "The quiet life of a terrier named Max is upended when his owner takes in Duke, a stray whom Max instantly dislikes.",
-        "release_date": "2016-06-18",
-        "genre_ids": [
-            12,
-            16,
-            35,
-            10751
-        ],
-        "id": 328111,
-        "original_title": "The Secret Life of Pets",
-        "original_language": "en",
-        "title": "The Secret Life of Pets",
-        "backdrop_path": "/lubzBMQLLmG88CLQ4F3TxZr2Q7N.jpg",
-        "popularity": 149.543296,
-        "vote_count": 1983,
-        "video": false,
-        "vote_average": 5.8
-    }
-    */
-
-
-
     public Movie() {}
 
     public static final String EXTRA_NAME = Movie.class.getSimpleName();
