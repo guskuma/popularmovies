@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorBackgroundLight">#EEEEEE</color>
+    <color name="colorStarActive">#FFFF00</color>
+    <color name="colorStarInactive">#BDBDBD</color>
 </resources>

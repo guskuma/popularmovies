@@ -2,11 +2,11 @@ package com.guskuma.popularmovies;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -14,7 +14,6 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +21,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.guskuma.DrawableHelper;
+import com.guskuma.Utils;
 import com.guskuma.tmdbapi.Movie;
 import com.guskuma.tmdbapi.Review;
 import com.guskuma.tmdbapi.ReviewResultSet;
@@ -49,8 +51,6 @@ public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
 
     @BindString(R.string.tmdb_api_key) String TMDB_API_KEY;
-    @BindString(R.string.youtube_api_key) String YOUTUBE_API_KEY;
-    private static final int RECOVERY_DIALOG_REQUEST = 16156;
 
     @BindView(R.id.tv_movie_title) TextView mMovieTitle;
     @BindView(R.id.tv_movie_original_title) TextView mMovieOriginalTitle;
@@ -84,15 +84,26 @@ public class MovieDetailActivity extends AppCompatActivity {
         mMovieOverview.setText(mMovie.overview);
         mMovieTitle.setText(mMovie.title);
         mMovieOriginalTitle.setText(mMovie.original_title);
-        mMovieRating.setText(mMovie.vote_average + " of 10 (" + mMovie.vote_count + " votes)");
+        String ratingText = getResources().getString(R.string.rating_text);
+        mMovieRating.setText(String.format(ratingText, mMovie.vote_average, mMovie.vote_count));
         mMovieReleaseDate.setText(mMovie.release_date);
 
-        if(isMovieFavorited()){
-            mFavorite.setBackground(getResources().getDrawable(R.drawable.ic_star_24dp));
-            PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.colorAccent),
-                    PorterDuff.Mode.SRC_ATOP);
-            mFavorite.setColorFilter(porterDuffColorFilter);
-        }
+        int color = isMovieFavorited() ? R.color.colorStarActive : R.color.colorStarInactive;
+
+        final Drawable drawable = DrawableHelper
+                .withContext(this)
+                .withColor(color)
+                .withDrawable(R.drawable.ic_star_24dp)
+                .tint()
+                .get();
+
+        mFavorite.setBackground(drawable);
+        mFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MovieDetailActivity.this, R.string.movie_favorited, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
 
@@ -112,7 +123,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private boolean isMovieFavorited(){
-        return true;
+        return mMovie.id %2 == 0;
     }
 
     private void getMovieVideosThumbnails(){
@@ -137,7 +148,8 @@ public class MovieDetailActivity extends AppCompatActivity {
                         ImageView thumbnail = (ImageView)view.findViewById(R.id.iv_movie_trailer_thumbnail);
                         thumbnail.setContentDescription(v.name);
                         if(mTrailerCount > 0) {
-                            int px = getPXfromDP();
+                            float dp = getResources().getDimension(R.dimen.between_text_vertical);
+                            int px = Utils.toPxValue(MovieDetailActivity.this, (int)dp);
                             Space space = getSpace(px, ViewGroup.LayoutParams.MATCH_PARENT);
                             mTrailersList.addView(space);
                         }
@@ -184,11 +196,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         });
     }
 
-    private int getPXfromDP() {
-        float dp = getResources().getDimension(R.dimen.between_text_vertical);
-        return (int) TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics() );
-    }
-
     @NonNull
     private Space getSpace(int width, int height) {
         Space space = new Space(MovieDetailActivity.this);
@@ -219,7 +226,8 @@ public class MovieDetailActivity extends AppCompatActivity {
                     tvReviewAuthor.setText("-" + v.author);
 
                     if(reviewsCount > 0) {
-                        int px = getPXfromDP();
+                        float dp = getResources().getDimension(R.dimen.between_text_vertical);
+                        int px = Utils.toPxValue(MovieDetailActivity.this, (int)dp);
                         Space space = getSpace(ViewGroup.LayoutParams.MATCH_PARENT, px);
                         mReviewsList.addView(space);
                     }
@@ -278,14 +286,17 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private void applyPalette(Palette palette) {
-        int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
-        int primary = getResources().getColor(R.color.colorPrimary);
-        int backgroundLight = getResources().getColor(R.color.colorBackgroundLight);
+        @ColorInt int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
+        @ColorInt int primary = getResources().getColor(R.color.colorPrimary);
+        @ColorInt int backgroundLight = getResources().getColor(R.color.colorBackgroundLight);
+        @ColorInt int accent = getResources().getColor(R.color.colorAccent);
+
         mCollapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
         mCollapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
         mCollapsingToolbarLayout.setBackgroundColor(palette.getDarkMutedColor(primaryDark));
         mMovieTitle.setTextColor(palette.getDarkMutedColor(primaryDark));
         mMovieDetailNestedScrollView.setBackgroundColor(palette.getLightMutedColor(backgroundLight));
+
         supportStartPostponedEnterTransition();
     }
 }

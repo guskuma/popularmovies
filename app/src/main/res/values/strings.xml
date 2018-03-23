@@ -13,6 +13,8 @@
     <string name="trailers">Trailers</string>
     <string name="play_trailer">Play Trailer</string>
     <string name="reviews">Reviews</string>
+    <string name="rating_text">%.2f of 10 (%d votes)</string>
+    <string name="movie_favorited">Movie marked as favorite</string>
 
     <string-array name="navigation_drawer_list">
         <item>Popular Movies</item>
