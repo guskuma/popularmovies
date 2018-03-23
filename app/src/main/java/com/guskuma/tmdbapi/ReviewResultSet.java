@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.util.List;
 
 /**
- * Created by juak on 21/03/18.
+ * Created by Julio Guskuma on 21/03/18.
  */
 
 public class ReviewResultSet implements Parcelable {

@@ -31,6 +31,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.guskuma.popularmovies.MainActivity" />
         </activity>
+        
+        <provider
+            android:authorities="com.guskuma.popularmovies"
+            android:name="com.guskuma.data.PopularMoviesContentProvider"
+            android:exported="false" />
     </application>
 
 </manifest>

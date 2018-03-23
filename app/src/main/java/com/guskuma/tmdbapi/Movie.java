@@ -6,12 +6,16 @@ import android.os.Parcelable;
 import java.util.Arrays;
 
 /**
- * Created by juak on 03/02/17.
+ * Created by Julio Guskuma on 03/02/17.
  */
 
 public class Movie implements Parcelable {
 
     public Movie() {}
+
+    public Movie(String id, String title, String overview, String release_date, String backdrop_path, String rating){
+
+    }
 
     public static final String EXTRA_NAME = Movie.class.getSimpleName();
 

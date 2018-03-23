@@ -19,12 +19,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by Julio on 28/01/2017.
+ * Created by Julio Guskuma on 28/01/2017.
  */
 
 public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewHolder> {
@@ -41,8 +40,7 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
     }
 
     public void addMovies(int pageNumber, @NonNull List<Movie> moviesToAdd){
-        if(moviesToAdd.size() >0) {
-            //mCurrentPage = pageNumber;
+        if(moviesToAdd.size() > 0) {
             mMovies.addAll(moviesToAdd);
             notifyDataSetChanged();
             Log.d(TAG, String.format("%s movies addes (page %s)", moviesToAdd.size(), pageNumber));
@@ -88,16 +86,6 @@ public class TMDbAdapter extends RecyclerView.Adapter<TMDbAdapter.MovieItemViewH
                 mMoviePosterImageView.getLayoutParams().width = Utils.toPxValue(itemView.getContext(), mImageWidth);
                 mMoviePosterImageView.getLayoutParams().height = Utils.toPxValue(itemView.getContext(), Double.valueOf(mImageWidth * 1.5027).intValue());
                 Picasso.with(itemView.getContext()).load(imageUri.toString()).into(mMoviePosterImageView);
-//            Picasso.Builder builder = new Picasso.Builder(itemView.getContext());
-//            builder.listener(new Picasso.Listener()
-//            {
-//                @Override
-//                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
-//                {
-//                    exception.printStackTrace();
-//                }
-//            });
-//            builder.build().load(imageUri.toString()).into(mMoviePosterImageView);
             }
         }
 

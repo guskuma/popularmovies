@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by juak on 03/02/17.
+ * Created by Julio Guskuma on 03/02/17.
  */
 
 public class DateInterval implements Parcelable {

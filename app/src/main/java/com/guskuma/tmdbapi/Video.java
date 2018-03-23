@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by juak on 20/03/18.
+ * Created by Julio Guskuma on 20/03/18.
  */
 
 public class Video implements Parcelable{

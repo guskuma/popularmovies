@@ -6,7 +6,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
- * Created by Julio on 30/01/2017.
+ * Created by Julio Guskuma on 30/01/2017.
  */
 
 public interface TMDbService {

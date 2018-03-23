@@ -3,10 +3,14 @@ package com.guskuma.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +32,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.guskuma.data.PopularMoviesContract;
 import com.guskuma.tmdbapi.Movie;
 import com.guskuma.tmdbapi.MovieFilterDescriptor;
 import com.guskuma.tmdbapi.MovieResultSet;
@@ -47,7 +52,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements Callback<MovieResultSet>, TMDbAdapter.MovieItemClickListener {
+public class MainActivity extends AppCompatActivity implements Callback<MovieResultSet>, TMDbAdapter.MovieItemClickListener, LoaderManager.LoaderCallbacks<MovieResultSet> {
 
     String TAG = MainActivity.class.getSimpleName();
 
@@ -64,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @BindArray(R.array.navigation_drawer_list_values)  String[] mDrawerOptionsValue;
     @BindView(R.id.my_toolbar) Toolbar mToolbar;
 
+    private static final int FAVORITE_MOVIES_LOADER = 22;
     int mImageWidth = 185;
 
     String mMovieCategory;
@@ -216,12 +222,21 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     }
 
     public void fetchMoviesList(int pageToLoad){
-        if(isOnline()) {
-            Call<MovieResultSet> call = mMovieService.getMoviesList(MovieFilterDescriptor.valueOf(mMovieCategory), TMDB_API_KEY, "en-US", pageToLoad);
-            call.enqueue(this);
-            mFetchProgress.setVisibility(View.VISIBLE);
+        if(getResources().getString(R.string.favorite_item_value).equals(mMovieCategory)){
+            Loader<MovieResultSet> favoriteMoviesLoader = getSupportLoaderManager().getLoader(FAVORITE_MOVIES_LOADER);
+            if(favoriteMoviesLoader == null){
+                getSupportLoaderManager().initLoader(FAVORITE_MOVIES_LOADER, null, this);
+            } else {
+                getSupportLoaderManager().restartLoader(FAVORITE_MOVIES_LOADER, null, this);
+            }
         } else {
-            toggleViewsVisibility(false);
+            if (isOnline()) {
+                Call<MovieResultSet> call = mMovieService.getMoviesList(MovieFilterDescriptor.valueOf(mMovieCategory), TMDB_API_KEY, "en-US", pageToLoad);
+                call.enqueue(this);
+                mFetchProgress.setVisibility(View.VISIBLE);
+            } else {
+                toggleViewsVisibility(false);
+            }
         }
     }
 
@@ -241,8 +256,6 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     private void toggleViewsVisibility(boolean success) {
         mEmptyScreen.setVisibility(success ? View.INVISIBLE : View.VISIBLE);
         mMoviesList.setVisibility(success ? View.VISIBLE : View.INVISIBLE);
-
-
     }
 
     @Override
@@ -281,5 +294,58 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @OnClick(R.id.bt_try_again)
     public void tryAgain(Button button){
         fetchMoviesList(1);
+    }
+
+    @Override
+    public Loader<MovieResultSet> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<MovieResultSet>(this) {
+            @Override
+            public MovieResultSet loadInBackground() {
+                MovieResultSet movieResultSet = new MovieResultSet();
+                try {
+                    Cursor cursor = getContentResolver().query(PopularMoviesContract.MovieEntry.CONTENT_URI, null, null, null, PopularMoviesContract.MovieEntry.RATING + " DESC");
+                    while(cursor.moveToNext()){
+                        String id = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry._ID));
+                        String title = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.TITLE));
+                        String overview = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.OVERVIEW));
+                        String releaseDate = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.RELEASE_DATE));
+                        String posterImage = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.POSTER_IMAGE));
+                        String rating = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.RATING));
+                        Movie movie = new Movie(id, title, overview, releaseDate, posterImage, rating);
+                        movieResultSet.results.add(movie);
+                    }
+                }catch (Exception e){
+                    Log.w(TAG, "Failed to asynchronously fetch data from ContentProvider");
+                }
+
+                movieResultSet.total_pages = 1;
+                movieResultSet.total_results = movieResultSet.results.size();
+                movieResultSet.page = 1;
+
+                return movieResultSet;
+            }
+
+            @Override
+            protected void onStartLoading() {
+                mFetchProgress.setVisibility(View.VISIBLE);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<MovieResultSet> loader, MovieResultSet movieResultSet) {
+        if(movieResultSet.results != null) {
+            Log.d(TAG, String.format("%s movies fetched (page %s)", movieResultSet.results.size(), movieResultSet.page));
+            mTMDbAdapter.addMovies(movieResultSet.page, movieResultSet.results);
+            toggleViewsVisibility(true);
+        } else {
+            toggleViewsVisibility(false);
+        }
+        mFetchProgress.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<MovieResultSet> loader) {
+
     }
 }

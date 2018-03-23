@@ -1,6 +1,8 @@
 package com.guskuma.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -27,6 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.guskuma.DrawableHelper;
 import com.guskuma.Utils;
+import com.guskuma.data.PopularMoviesContract;
 import com.guskuma.tmdbapi.Movie;
 import com.guskuma.tmdbapi.Review;
 import com.guskuma.tmdbapi.ReviewResultSet;
@@ -101,7 +104,20 @@ public class MovieDetailActivity extends AppCompatActivity {
         mFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MovieDetailActivity.this, R.string.movie_favorited, Toast.LENGTH_SHORT).show();
+                if(isMovieFavorited()){
+                    Toast.makeText(MovieDetailActivity.this, R.string.movie_favorited, Toast.LENGTH_SHORT).show();
+                } else {
+                    ContentValues values = new ContentValues();
+                    values.put(PopularMoviesContract.MovieEntry.TITLE, mMovie.title);
+                    values.put(PopularMoviesContract.MovieEntry.OVERVIEW, mMovie.overview);
+                    values.put(PopularMoviesContract.MovieEntry.RATING, mMovie.vote_average);
+                    values.put(PopularMoviesContract.MovieEntry.RELEASE_DATE, mMovie.release_date);
+//                    values.put(PopularMoviesContract.MovieEntry.POSTER_IMAGE, mMovie.backdrop_path);
+
+                    getContentResolver().insert(PopularMoviesContract.MovieEntry.CONTENT_URI,values);
+                    Toast.makeText(MovieDetailActivity.this, R.string.movie_unfavorited, Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
@@ -123,7 +139,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private boolean isMovieFavorited(){
-        return mMovie.id %2 == 0;
+        Cursor cursor = getContentResolver().query(PopularMoviesContract.MovieEntry.CONTENT_URI, null, PopularMoviesContract.MovieEntry._ID + " = ?", new String[]{String.valueOf(mMovie.id)}, null);
+        return cursor.getCount() > 0;
     }
 
     private void getMovieVideosThumbnails(){

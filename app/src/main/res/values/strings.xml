@@ -15,12 +15,15 @@
     <string name="reviews">Reviews</string>
     <string name="rating_text">%.2f of 10 (%d votes)</string>
     <string name="movie_favorited">Movie marked as favorite</string>
+    <string name="movie_unfavorited">Movie removed from favorites</string>
+    <string name="favorite_item_value">favorited</string>
 
     <string-array name="navigation_drawer_list">
         <item>Popular Movies</item>
         <item>Top Rated Movies</item>
         <item>Now Playing Movies</item>
         <item>Upcoming Movies</item>
+        <item>Favorite Movies</item>
     </string-array>
 
     <string-array name="navigation_drawer_list_values">
@@ -28,6 +31,7 @@
         <item>top_rated</item>
         <item>now_playing</item>
         <item>upcoming</item>
+        <item>@string/favorite_item_value</item>
     </string-array>
 
 </resources>

@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.util.List;
 
 /**
- * Created by juak on 07/02/17.
+ * Created by Julio Guskuma on 07/02/17.
  */
 
 public class DetailedMovie implements Parcelable {

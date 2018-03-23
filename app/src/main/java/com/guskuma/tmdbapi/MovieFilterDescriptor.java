@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by juak on 03/02/17.
+ * Created by Julio Guskuma on 03/02/17.
  */
 
 public class MovieFilterDescriptor {
