@@ -28,15 +28,17 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginLeft="@dimen/text_margin"
+            android:layout_marginStart="@dimen/text_margin"/>
 
         <TextView
             android:id="@+id/tv_movie_title"
             tools:text="Lorem Ipsum Dolor"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_favorite"
-            android:layout_marginLeft="@dimen/text_margin"
-            android:layout_marginStart="@dimen/text_margin"
+            android:layout_marginLeft="@dimen/between_text_vertical"
+            android:layout_marginStart="@dimen/between_text_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
