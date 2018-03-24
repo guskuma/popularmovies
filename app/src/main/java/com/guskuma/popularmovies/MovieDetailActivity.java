@@ -91,33 +91,29 @@ public class MovieDetailActivity extends AppCompatActivity {
         mMovieRating.setText(String.format(ratingText, mMovie.vote_average, mMovie.vote_count));
         mMovieReleaseDate.setText(mMovie.release_date);
 
-        int color = isMovieFavorited() ? R.color.colorStarActive : R.color.colorStarInactive;
-
-        final Drawable drawable = DrawableHelper
-                .withContext(this)
-                .withColor(color)
-                .withDrawable(R.drawable.ic_star_24dp)
-                .tint()
-                .get();
-
-        mFavorite.setBackground(drawable);
+        setFavouriteStarColor();
         mFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(isMovieFavorited()){
-                    Toast.makeText(MovieDetailActivity.this, R.string.movie_favorited, Toast.LENGTH_SHORT).show();
+                    getContentResolver().delete(PopularMoviesContract.MovieEntry.CONTENT_URI,
+                            PopularMoviesContract.MovieEntry.TMDB_ID + " = ?", new String[]{String.valueOf(mMovie.id)});
+                    Toast.makeText(MovieDetailActivity.this, R.string.movie_unfavorited, Toast.LENGTH_SHORT).show();
                 } else {
                     ContentValues values = new ContentValues();
+                    values.put(PopularMoviesContract.MovieEntry.TMDB_ID, mMovie.id);
                     values.put(PopularMoviesContract.MovieEntry.TITLE, mMovie.title);
                     values.put(PopularMoviesContract.MovieEntry.OVERVIEW, mMovie.overview);
                     values.put(PopularMoviesContract.MovieEntry.RATING, mMovie.vote_average);
                     values.put(PopularMoviesContract.MovieEntry.RELEASE_DATE, mMovie.release_date);
-//                    values.put(PopularMoviesContract.MovieEntry.POSTER_IMAGE, mMovie.backdrop_path);
+                    values.put(PopularMoviesContract.MovieEntry.POSTER_PATH, mMovie.poster_path);
+                    values.put(PopularMoviesContract.MovieEntry.BACKDROP_PATH, mMovie.backdrop_path);
+                    values.put(PopularMoviesContract.MovieEntry.DATE_ADDED, ((Long)(System.currentTimeMillis()/1000)).toString());
 
                     getContentResolver().insert(PopularMoviesContract.MovieEntry.CONTENT_URI,values);
-                    Toast.makeText(MovieDetailActivity.this, R.string.movie_unfavorited, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MovieDetailActivity.this, R.string.movie_favorited, Toast.LENGTH_SHORT).show();
                 }
-
+                setFavouriteStarColor();
             }
         });
 
@@ -138,8 +134,21 @@ public class MovieDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    private void setFavouriteStarColor() {
+        int color = isMovieFavorited() ? R.color.colorStarActive : R.color.colorStarInactive;
+
+        final Drawable drawable = DrawableHelper
+                .withContext(this)
+                .withColor(color)
+                .withDrawable(R.drawable.ic_star_24dp)
+                .tint()
+                .get();
+
+        mFavorite.setBackground(drawable);
+    }
+
     private boolean isMovieFavorited(){
-        Cursor cursor = getContentResolver().query(PopularMoviesContract.MovieEntry.CONTENT_URI, null, PopularMoviesContract.MovieEntry._ID + " = ?", new String[]{String.valueOf(mMovie.id)}, null);
+        Cursor cursor = getContentResolver().query(PopularMoviesContract.MovieEntry.CONTENT_URI, null, PopularMoviesContract.MovieEntry.TMDB_ID + " = ?", new String[]{String.valueOf(mMovie.id)}, null);
         return cursor.getCount() > 0;
     }
 
@@ -159,7 +168,6 @@ public class MovieDetailActivity extends AppCompatActivity {
 
                         int layoutIdForListItem = R.layout.item_movie_trailer;
                         LayoutInflater inflater = LayoutInflater.from(MovieDetailActivity.this);
-                        boolean shouldAttachToParentImmediately = true;
 
                         View view = inflater.inflate(layoutIdForListItem, mTrailersList, false);
                         ImageView thumbnail = (ImageView)view.findViewById(R.id.iv_movie_trailer_thumbnail);

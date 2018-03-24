@@ -13,8 +13,14 @@ public class Movie implements Parcelable {
 
     public Movie() {}
 
-    public Movie(String id, String title, String overview, String release_date, String backdrop_path, String rating){
-
+    public Movie(String tmdbId, String title, String overview, String release_date, String backdrop_path, String poster_path, String rating){
+        this.id = Integer.valueOf(tmdbId);
+        this.title = title;
+        this.overview = overview;
+        this.release_date = release_date;
+        this.backdrop_path = backdrop_path;
+        this.poster_path = poster_path;
+        this.vote_average = Double.valueOf(rating);
     }
 
     public static final String EXTRA_NAME = Movie.class.getSimpleName();

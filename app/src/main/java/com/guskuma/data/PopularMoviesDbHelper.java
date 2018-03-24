@@ -21,11 +21,14 @@ public class PopularMoviesDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + PopularMoviesContract.MovieEntry.TABLE_NAME + " (" +
                 PopularMoviesContract.MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                PopularMoviesContract.MovieEntry.TMDB_ID + " INTEGER NOT NULL, " +
                 PopularMoviesContract.MovieEntry.TITLE + " TEXT NOT NULL, " +
                 PopularMoviesContract.MovieEntry.OVERVIEW + " TEXT NOT NULL, " +
                 PopularMoviesContract.MovieEntry.RELEASE_DATE + " TEXT NOT NULL, " +
                 PopularMoviesContract.MovieEntry.RATING + " TEXT NOT NULL, " +
-                PopularMoviesContract.MovieEntry.POSTER_IMAGE + " BLOB);";
+                PopularMoviesContract.MovieEntry.BACKDROP_PATH + " TEXT NOT NULL, " +
+                PopularMoviesContract.MovieEntry.POSTER_PATH + " TEXT NOT NULL, " +
+                PopularMoviesContract.MovieEntry.DATE_ADDED + " TIMESTAMP NOT NULL);";
 
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
     }

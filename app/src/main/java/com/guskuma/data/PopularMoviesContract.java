@@ -19,11 +19,14 @@ public class PopularMoviesContract {
 
         public static final String TABLE_NAME = "movie";
 
+        public static final String TMDB_ID = "tmdb_id";
         public static final String TITLE = "title";
         public static final String OVERVIEW = "overview";
         public static final String RELEASE_DATE = "release_date";
-        public static final String POSTER_IMAGE = "poster_image";
+        public static final String BACKDROP_PATH = "backdrop_path";
+        public static final String POSTER_PATH = "poster_path";
         public static final String RATING = "rating";
+        public static final String DATE_ADDED = "date_added";
     }
 
 }

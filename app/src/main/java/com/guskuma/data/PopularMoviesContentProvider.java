@@ -98,8 +98,6 @@ public class PopularMoviesContentProvider extends ContentProvider {
 
         switch (match){
             case MOVIES:
-                throw new UnsupportedOperationException("Deleting all entries is not allowed");
-            case MOVIE_WITH_ID:
                 entriesDeleted = db.delete(PopularMoviesContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
                 if(entriesDeleted > 0){
                     getContext().getContentResolver().notifyChange(PopularMoviesContract.MovieEntry.CONTENT_URI, null);

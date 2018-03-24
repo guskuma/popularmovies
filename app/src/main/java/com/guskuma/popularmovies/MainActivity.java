@@ -39,6 +39,7 @@ import com.guskuma.tmdbapi.MovieResultSet;
 import com.guskuma.tmdbapi.TMDbAdapter;
 import com.guskuma.tmdbapi.TMDbService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindArray;
@@ -52,7 +53,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements Callback<MovieResultSet>, TMDbAdapter.MovieItemClickListener, LoaderManager.LoaderCallbacks<MovieResultSet> {
+public class MainActivity extends AppCompatActivity implements Callback<MovieResultSet>,
+        TMDbAdapter.MovieItemClickListener, LoaderManager.LoaderCallbacks<MovieResultSet> {
 
     String TAG = MainActivity.class.getSimpleName();
 
@@ -148,11 +150,15 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
             if(reset) {
                 mTMDbAdapter.reset();
-                mEndlessScrollListener.resetState();
-                mMoviesList.scrollToPosition(0);
+                resetScrollListener();
                 fetchMoviesList(1);
             }
         }
+    }
+
+    private void resetScrollListener() {
+        mEndlessScrollListener.resetState();
+        mMoviesList.scrollToPosition(0);
     }
 
     @Override
@@ -183,12 +189,17 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     protected void onResume() {
         super.onResume();
 
-        // Fetches only if there´s no movies loaded
-        if(mTMDbAdapter.getMovies().size() == 0) {
-            changeMovieCategory(mMovieCategory, true);
+        if(getResources().getString(R.string.favorite_item_value).equals(mMovieCategory)){
+            mTMDbAdapter.reset();
             fetchMoviesList(1);
         } else {
-            changeMovieCategory(mMovieCategory, false);
+            // Fetches only if there´s no movies loaded
+            if(mTMDbAdapter.getMovies().size() == 0) {
+                changeMovieCategory(mMovieCategory, true);
+                fetchMoviesList(1);
+            } else {
+                changeMovieCategory(mMovieCategory, false);
+            }
         }
     }
 
@@ -223,11 +234,13 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     public void fetchMoviesList(int pageToLoad){
         if(getResources().getString(R.string.favorite_item_value).equals(mMovieCategory)){
-            Loader<MovieResultSet> favoriteMoviesLoader = getSupportLoaderManager().getLoader(FAVORITE_MOVIES_LOADER);
-            if(favoriteMoviesLoader == null){
-                getSupportLoaderManager().initLoader(FAVORITE_MOVIES_LOADER, null, this);
-            } else {
-                getSupportLoaderManager().restartLoader(FAVORITE_MOVIES_LOADER, null, this);
+            if(pageToLoad == 1) {
+                Loader<MovieResultSet> favoriteMoviesLoader = getSupportLoaderManager().getLoader(FAVORITE_MOVIES_LOADER);
+                if (favoriteMoviesLoader == null) {
+                    getSupportLoaderManager().initLoader(FAVORITE_MOVIES_LOADER, null, this).forceLoad();
+                } else {
+                    getSupportLoaderManager().restartLoader(FAVORITE_MOVIES_LOADER, null, this).forceLoad();
+                }
             }
         } else {
             if (isOnline()) {
@@ -296,40 +309,54 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         fetchMoviesList(1);
     }
 
+    private static class FavoriteLoader extends AsyncTaskLoader<MovieResultSet> {
+
+        String TAG = FavoriteLoader.class.getSimpleName();
+
+        public FavoriteLoader(Context context){
+            super(context);
+        }
+
+        @Override
+        public MovieResultSet loadInBackground() {
+            MovieResultSet movieResultSet = new MovieResultSet();
+            movieResultSet.results = new ArrayList<>();
+            try {
+                Cursor cursor = getContext().getContentResolver().query(PopularMoviesContract.MovieEntry.CONTENT_URI,
+                        null, null, null,
+                        PopularMoviesContract.MovieEntry.DATE_ADDED + " DESC");
+                while(cursor.moveToNext()){
+                    String id = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.TMDB_ID));
+                    String title = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.TITLE));
+                    String overview = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.OVERVIEW));
+                    String releaseDate = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.RELEASE_DATE));
+                    String backdropImage = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.BACKDROP_PATH));
+                    String posterImage = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.POSTER_PATH));
+                    String rating = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.RATING));
+                    Movie movie = new Movie(id, title, overview, releaseDate, backdropImage, posterImage, rating);
+                    movieResultSet.results.add(movie);
+                }
+            }catch (Exception e){
+                Log.w(TAG, "Failed to asynchronously fetch data from ContentProvider");
+            }
+
+            movieResultSet.total_pages = 1;
+            movieResultSet.total_results = movieResultSet.results.size();
+            movieResultSet.page = 1;
+
+            return movieResultSet;
+        }
+
+        @Override
+        protected void onStartLoading() {
+            super.onStartLoading();
+        }
+    }
+
     @Override
     public Loader<MovieResultSet> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<MovieResultSet>(this) {
-            @Override
-            public MovieResultSet loadInBackground() {
-                MovieResultSet movieResultSet = new MovieResultSet();
-                try {
-                    Cursor cursor = getContentResolver().query(PopularMoviesContract.MovieEntry.CONTENT_URI, null, null, null, PopularMoviesContract.MovieEntry.RATING + " DESC");
-                    while(cursor.moveToNext()){
-                        String id = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry._ID));
-                        String title = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.TITLE));
-                        String overview = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.OVERVIEW));
-                        String releaseDate = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.RELEASE_DATE));
-                        String posterImage = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.POSTER_IMAGE));
-                        String rating = cursor.getString(cursor.getColumnIndex(PopularMoviesContract.MovieEntry.RATING));
-                        Movie movie = new Movie(id, title, overview, releaseDate, posterImage, rating);
-                        movieResultSet.results.add(movie);
-                    }
-                }catch (Exception e){
-                    Log.w(TAG, "Failed to asynchronously fetch data from ContentProvider");
-                }
-
-                movieResultSet.total_pages = 1;
-                movieResultSet.total_results = movieResultSet.results.size();
-                movieResultSet.page = 1;
-
-                return movieResultSet;
-            }
-
-            @Override
-            protected void onStartLoading() {
-                mFetchProgress.setVisibility(View.VISIBLE);
-            }
-        };
+        mFetchProgress.setVisibility(View.VISIBLE);
+        return new FavoriteLoader(this);
     }
 
     @Override

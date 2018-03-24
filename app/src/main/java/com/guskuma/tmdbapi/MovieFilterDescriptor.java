@@ -14,6 +14,7 @@ public class MovieFilterDescriptor {
     public static final String NOW_PLAYING = "now_playing";
     public static final String POPULAR = "popular";
     public static final String TOP_RATED = "top_rated";
+    public static final String FAVORITES = "favorited";
     public static final String UPCOMING = "upcoming";
 
     public final String movieFilter;
@@ -21,7 +22,7 @@ public class MovieFilterDescriptor {
     @Retention(RetentionPolicy.SOURCE)
 
     // Enumerate valid values for this interface
-    @StringDef({ LATEST, NOW_PLAYING, POPULAR, TOP_RATED, UPCOMING })
+    @StringDef({ LATEST, NOW_PLAYING, POPULAR, TOP_RATED, UPCOMING, FAVORITES })
 
     // Create an interface for validating int types
     public @interface MovieFilterDef { }
@@ -43,6 +44,8 @@ public class MovieFilterDescriptor {
                 return TOP_RATED;
             case UPCOMING:
                 return UPCOMING;
+            case FAVORITES:
+                return FAVORITES;
             default:
                 return null;
         }
@@ -60,6 +63,8 @@ public class MovieFilterDescriptor {
                 return "Top Rated Movies";
             case UPCOMING:
                 return "Upcoming Movies";
+            case FAVORITES:
+                return "Favorite Movies";
             default:
                 return null;
         }
