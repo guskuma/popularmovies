@@ -28,31 +28,45 @@
             android:background="@color/colorBackgroundLight"
             android:visibility="visible"/>
 
-        <LinearLayout
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/no_connection_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            android:layout_gravity="center_horizontal|top"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/text_margin"
+            android:visibility="invisible">
 
             <TextView
                 android:id="@+id/tv_empty_list"
-                android:text="@string/empty_list"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/text_margin"
+                android:layout_marginEnd="@dimen/text_margin"
+                android:layout_marginStart="@dimen/text_margin"
                 android:layout_marginTop="?attr/actionBarSize"
-                android:padding="16dp" />
+                android:text="@string/empty_list"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.35" />
 
             <Button
                 android:id="@+id/bt_try_again"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/try_again"
                 android:layout_gravity="center"
-                android:padding="16dp"/>
+                android:layout_marginEnd="@dimen/text_margin"
+                android:layout_marginStart="@dimen/text_margin"
+                android:layout_marginTop="@dimen/text_margin"
+                android:text="@string/try_again"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_empty_list" />
 
-        </LinearLayout>
+        </android.support.constraint.ConstraintLayout>
 
         <ProgressBar
             android:id="@+id/pb_fetching"
