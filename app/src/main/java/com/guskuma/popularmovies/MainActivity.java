@@ -373,6 +373,6 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     @Override
     public void onLoaderReset(Loader<MovieResultSet> loader) {
-
+// Oba!
     }
 }
