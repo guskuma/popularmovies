@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Popular Movies</string>
-    <string name="empty_list_no_connection">No movie retrieved, please check your internet connection</string>
-    <string name="empty_list">No movie available in this category</string>
+    <string name="empty_list_no_connection">No movie retrieved.\nPlease check your internet connection</string>
+    <string name="empty_list">No movie marked as favorite</string>
     <string name="try_again">Try again</string>
     <string name="fetch_fail">Movies list could not be fetched</string>
     <string name="drawer_open">Navigation drawer opened</string>

@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     private void toggleViewsVisibility(boolean success, boolean empty) {
         mEmptyScreen.setVisibility(success && !empty ? View.INVISIBLE : View.VISIBLE);
-        mMoviesList.setVisibility(success ? View.VISIBLE : View.INVISIBLE);
+        mMoviesList.setVisibility(success && !empty ? View.VISIBLE : View.INVISIBLE);
 
         if(success) {
             if(empty) {
