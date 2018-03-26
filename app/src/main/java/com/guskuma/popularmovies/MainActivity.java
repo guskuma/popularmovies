@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @BindView(R.id.pb_fetching)    ProgressBar mFetchProgress;
     @BindView(R.id.no_connection_view)  View mEmptyScreen;
     @BindView(R.id.bt_try_again) Button mTryAgainButton;
+    @BindView(R.id.tv_empty_list) TextView mEmptyList;
     @BindString(R.string.fetch_fail) String toastMessage;
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
     @BindView(R.id.drawer_menu) LinearLayout mDrawerMenu;
@@ -248,27 +250,42 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
                 call.enqueue(this);
                 mFetchProgress.setVisibility(View.VISIBLE);
             } else {
-                toggleViewsVisibility(false);
+                toggleViewsVisibility(false, false);
             }
         }
     }
 
     @Override
     public void onResponse(Call<MovieResultSet> call, Response<MovieResultSet> response) {
-        if(response.isSuccessful() && response.body().results != null) {
+        if(!response.isSuccessful()) {
+            toggleViewsVisibility(false, true);
+            return;
+        }
+
+        if(response.body().results != null && response.body().results.size() > 0) {
             MovieResultSet movieResultSet = response.body();
             Log.d(TAG, String.format("%s movies fetched (page %s)", movieResultSet.results.size(), movieResultSet.page));
             mTMDbAdapter.addMovies(movieResultSet.page, movieResultSet.results);
-            toggleViewsVisibility(true);
+            toggleViewsVisibility(true, false);
         } else {
-            toggleViewsVisibility(false);
+            toggleViewsVisibility(true, true);
         }
         mFetchProgress.setVisibility(View.INVISIBLE);
     }
 
-    private void toggleViewsVisibility(boolean success) {
-        mEmptyScreen.setVisibility(success ? View.INVISIBLE : View.VISIBLE);
+    private void toggleViewsVisibility(boolean success, boolean empty) {
+        mEmptyScreen.setVisibility(success && !empty ? View.INVISIBLE : View.VISIBLE);
         mMoviesList.setVisibility(success ? View.VISIBLE : View.INVISIBLE);
+
+        if(success) {
+            if(empty) {
+                mTryAgainButton.setVisibility(View.GONE);
+                mEmptyList.setText(R.string.empty_list);
+            }
+        } else {
+            mTryAgainButton.setVisibility(View.VISIBLE);
+            mEmptyList.setText(R.string.empty_list_no_connection);
+        }
     }
 
     @Override
@@ -361,12 +378,12 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     @Override
     public void onLoadFinished(Loader<MovieResultSet> loader, MovieResultSet movieResultSet) {
-        if(movieResultSet.results != null) {
+        if(movieResultSet.results != null && movieResultSet.results.size() > 0) {
             Log.d(TAG, String.format("%s movies fetched (page %s)", movieResultSet.results.size(), movieResultSet.page));
             mTMDbAdapter.addMovies(movieResultSet.page, movieResultSet.results);
-            toggleViewsVisibility(true);
+            toggleViewsVisibility(true, false);
         } else {
-            toggleViewsVisibility(false);
+            toggleViewsVisibility(true, true);
         }
         mFetchProgress.setVisibility(View.INVISIBLE);
     }
