@@ -74,7 +74,8 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @BindView(R.id.my_toolbar) Toolbar mToolbar;
 
     private static final int FAVORITE_MOVIES_LOADER = 22;
-    int mImageWidth = 185;
+    private static final int SPACE_BETWEEN_COLUMNS = 10;
+    private static int IMAGE_WIDTH = 185;
 
     String mMovieCategory;
     ActionBarDrawerToggle mDrawerToggle;
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mMoviesList.setLayoutManager(layoutManager);
         mMoviesList.setHasFixedSize(false);
 
-        mTMDbAdapter = new TMDbAdapter(this, mImageWidth);
+        mTMDbAdapter = new TMDbAdapter(this, IMAGE_WIDTH);
         mMoviesList.setAdapter(mTMDbAdapter);
 
         mEndlessScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
@@ -209,10 +210,10 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int noOfColumns = (int) (dpWidth / (mImageWidth + border));
+        int noOfColumns = (int) (dpWidth / (IMAGE_WIDTH + border));
 
         if(noOfColumns <= 1){
-            mImageWidth = mImageWidth - 10;
+            IMAGE_WIDTH = IMAGE_WIDTH - SPACE_BETWEEN_COLUMNS;
             return calculateNumItensInRows(20);
         }
 
